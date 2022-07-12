@@ -47,7 +47,21 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
-}`;
+}
+* {
+  box-sizing: border-box;
+}
+li {
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+body {
+  margin-top: 68px;
+}
+`;
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
