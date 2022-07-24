@@ -4,7 +4,9 @@ import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import { getMovies, IGetMovieResult } from "./api";
 import { makeImagePath } from "../utils";
 import { useState } from "react";
-import { ParamKeyValuePair, useMatch, useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
+import TopMovieSlider from "./Components/TopMovieSlieder";
+import UpcomingMovieSlider from "./Components/UpcomingMovieSlider";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -41,6 +43,7 @@ const Overview = styled.p`
 const Slider = styled.div`
   position: relative;
   top: -100px;
+  margin: 0px 60px;
 `;
 
 const Row = styled(motion.div)`
@@ -121,7 +124,20 @@ const BigOverview = styled.p`
   color: ${(props) => props.theme.white.lighter};
 `;
 
-const rowVariants = {
+const NextBtn = styled.span`
+  position: absolute;
+  right: -40px;
+  top: 65px;
+  font-size: 42px;
+`;
+
+const SlideTitle = styled.h3`
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
+export const rowVariants = {
   hidden: {
     x: window.outerWidth + 5,
   },
@@ -133,7 +149,7 @@ const rowVariants = {
   },
 };
 
-const boxVariants = {
+export const boxVariants = {
   normal: {
     scale: 1,
   },
@@ -148,7 +164,7 @@ const boxVariants = {
   },
 };
 
-const infoVariants = {
+export const infoVariants = {
   hover: {
     opacity: 1,
     transition: {
@@ -165,18 +181,18 @@ function Home() {
   const navigate = useNavigate();
   const bigMovieMatch = useMatch("/movies/:movieId");
   const { scrollY } = useViewportScroll();
-  const { data, isLoading } = useQuery<IGetMovieResult>(
+  const { data: nowData, isLoading: nowLoading } = useQuery<IGetMovieResult>(
     ["movies", "nowPlaying"],
     getMovies
   );
-  const [index, setIndex] = useState(0);
+  const [nowIndex, setNowIndex] = useState(0);
   const increadeIndex = () => {
-    if (data) {
+    if (nowData) {
       if (leaving) return;
       toggleLeaving();
-      const totalMovies = data.results.length - 1;
+      const totalMovies = nowData.results.length - 1;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+      setNowIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
   const [leaving, setLeaving] = useState(false);
@@ -187,35 +203,35 @@ function Home() {
   const onOverlayClick = () => navigate("/");
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
-    data?.results.find(
+    nowData?.results.find(
       (movie) => movie.id + "" === bigMovieMatch.params.movieId
     );
   return (
     <Wrapper>
-      {isLoading ? (
+      {nowLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
           <Banner
-            onClick={increadeIndex}
-            bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
+            bgPhoto={makeImagePath(nowData?.results[0].backdrop_path || "")}
           >
-            <Title>{data?.results[0].title}</Title>
-            <Overview>{data?.results[0].overview}</Overview>
+            <Title>{nowData?.results[0].title}</Title>
+            <Overview>{nowData?.results[0].overview}</Overview>
           </Banner>
           <Slider>
             <AnimatePresence onExitComplete={toggleLeaving} initial={false}>
+              <SlideTitle>Now Playing</SlideTitle>
               <Row
-                key={index}
+                key={nowIndex}
                 variants={rowVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
                 transition={{ type: "tween", duration: 1 }}
               >
-                {data?.results
+                {nowData?.results
                   .slice(1)
-                  .slice(offset * index, offset * index + offset)
+                  .slice(offset * nowIndex, offset * nowIndex + offset)
                   .map((movie) => (
                     <Box
                       onClick={() => onBoxClicked(movie.id)}
@@ -232,11 +248,14 @@ function Home() {
                       </Info>
                     </Box>
                   ))}
+                <NextBtn onClick={increadeIndex}>〉</NextBtn>
               </Row>
+              <TopMovieSlider />
+              <UpcomingMovieSlider />
             </AnimatePresence>
           </Slider>
           <AnimatePresence>
-            {bigMovieMatch ? (
+            {clickedMovie ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
