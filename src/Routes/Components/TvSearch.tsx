@@ -135,7 +135,6 @@ function TvSearch({ keyword }: IProp) {
   const clickedMovie =
     bigMovieMatch?.params.tvId &&
     data?.results.find((tv) => tv.id + "" === bigMovieMatch.params.tvId);
-  console.log(bigMovieMatch, clickedMovie);
   return (
     <>
       <AnimatePresence onExitComplete={toggleLeaving} initial={false}>

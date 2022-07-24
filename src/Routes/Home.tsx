@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
 import TopMovieSlider from "./Components/TopMovieSlieder";
 import UpcomingMovieSlider from "./Components/UpcomingMovieSlider";
+import Modal from "./Components/Modal";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -206,6 +207,7 @@ function Home() {
     nowData?.results.find(
       (movie) => movie.id + "" === bigMovieMatch.params.movieId
     );
+  console.log(bigMovieMatch, clickedMovie);
   return (
     <Wrapper>
       {nowLoading ? (
@@ -263,25 +265,11 @@ function Home() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 />
-                <BigMovie
-                  layoutId={bigMovieMatch.params.movieId}
-                  style={{ top: scrollY.get() + 100 }}
-                >
-                  {clickedMovie && (
-                    <>
-                      <BigCover
-                        style={{
-                          backgroundImage: `linear-gradient(to top,  black, transparent), url(${makeImagePath(
-                            clickedMovie.backdrop_path,
-                            "w500"
-                          )})`,
-                        }}
-                      />
-                      <BigTitle>{clickedMovie.title}</BigTitle>
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
-                    </>
-                  )}
-                </BigMovie>
+                <Modal
+                  bigMovieMatch={bigMovieMatch}
+                  clickedMovie={clickedMovie}
+                  locate={100}
+                />
               </>
             ) : null}
           </AnimatePresence>

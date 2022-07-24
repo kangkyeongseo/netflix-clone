@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { makeImagePath } from "../../utils";
 import { getTopRatedMovies, getUpcomingtMovies, IGetMovieResult } from "../api";
 import { boxVariants, infoVariants, rowVariants } from "../Home";
+import Modal from "./Modal";
 
 const Row = styled(motion.div)`
   display: grid;
@@ -131,7 +132,6 @@ function UpcomingMovieSlider() {
     upcomingData?.results.find(
       (movie) => movie.id + "" === bigMovieMatch.params.movieId
     );
-  console.log(bigMovieMatch, clickedMovie);
   return (
     <>
       <AnimatePresence onExitComplete={toggleLeaving} initial={false}>
@@ -175,25 +175,11 @@ function UpcomingMovieSlider() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
-            <BigMovie
-              layoutId={bigMovieMatch.params.movieId}
-              style={{ top: scrollY.get() - 700 }}
-            >
-              {clickedMovie && (
-                <>
-                  <BigCover
-                    style={{
-                      backgroundImage: `linear-gradient(to top,  black, transparent), url(${makeImagePath(
-                        clickedMovie.backdrop_path,
-                        "w500"
-                      )})`,
-                    }}
-                  />
-                  <BigTitle>{clickedMovie.title}</BigTitle>
-                  <BigOverview>{clickedMovie.overview}</BigOverview>
-                </>
-              )}
-            </BigMovie>
+            <Modal
+              bigMovieMatch={bigMovieMatch}
+              clickedMovie={clickedMovie}
+              locate={-700}
+            />
           </>
         ) : null}
       </AnimatePresence>

@@ -137,7 +137,7 @@ function UpcomingVideoSlider() {
     upcomingData?.results.find(
       (movie) => movie.id + "" === bigMovieMatch.params.tvId
     );
-  console.log(bigMovieMatch, clickedMovie);
+
   return (
     <>
       <AnimatePresence onExitComplete={toggleLeaving} initial={false}>
