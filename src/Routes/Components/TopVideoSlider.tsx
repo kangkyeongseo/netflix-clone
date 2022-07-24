@@ -17,7 +17,7 @@ const Row = styled(motion.div)`
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
   position: absolute;
-  top: 350px;
+  top: 300px;
   width: 100%;
 `;
 
@@ -104,7 +104,7 @@ const SlideTitle = styled.h3`
   font-weight: bold;
   margin-bottom: 20px;
   position: absolute;
-  top: 300px;
+  top: 250px;
 `;
 
 const offset = 6;

@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { makeImagePath } from "../../utils";
-import { getTopRatedMovies, getUpcomingtMovies, IGetMovieResult } from "../api";
+import { getSearchMovies, getTopRatedMovies, IGetMovieResult } from "../api";
 import { boxVariants, infoVariants, rowVariants } from "../Home";
 
 const Row = styled(motion.div)`
@@ -12,7 +12,7 @@ const Row = styled(motion.div)`
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
   position: absolute;
-  top: 550px;
+  top: 300px;
   width: 100%;
 `;
 
@@ -69,6 +69,7 @@ const BigMovie = styled(motion.div)`
   margin: 0 auto;
   border-radius: 15px;
   overflow: hidden;
+  z-index: 100;
 `;
 
 const BigCover = styled.div`
@@ -98,55 +99,62 @@ const SlideTitle = styled.h3`
   font-weight: bold;
   margin-bottom: 20px;
   position: absolute;
-  top: 500px;
+  top: 250px;
 `;
+
+interface IProp {
+  keyword: string;
+}
 
 const offset = 6;
 
-function UpcomingMovieSlider() {
+function MovieSearch({ keyword }: IProp) {
   const navigate = useNavigate();
-  const bigMovieMatch = useMatch("/movies/:movieId");
-  const { data: upcomingData, isLoading: upcomingLoading } =
-    useQuery<IGetMovieResult>(["movies", "upcoming"], getUpcomingtMovies);
-  const [upcomingIndex, setUpcomingIndex] = useState(0);
+  const bigMovieMatch = useMatch("/search/movies/:movieId");
+  console.log(bigMovieMatch);
+  const { data, isLoading } = useQuery<IGetMovieResult>(
+    ["movies", "search"],
+    () => getSearchMovies(keyword)
+  );
+  const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
 
-  const increadeUpcomingIndex = () => {
-    if (upcomingData) {
+  const increadeTopIndex = () => {
+    if (data) {
       if (leaving) return;
       toggleLeaving();
-      const totalMovies = upcomingData.results.length - 1;
+      const totalMovies = data.results.length - 1;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setUpcomingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
   const { scrollY } = useViewportScroll();
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
+    navigate(`/search/movies/${movieId}`);
   };
-  const onOverlayClick = () => navigate("/");
+  const onOverlayClick = () => navigate("/search");
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
-    upcomingData?.results.find(
+    data?.results.find(
       (movie) => movie.id + "" === bigMovieMatch.params.movieId
     );
   console.log(bigMovieMatch, clickedMovie);
   return (
     <>
       <AnimatePresence onExitComplete={toggleLeaving} initial={false}>
-        <SlideTitle>Upcoming</SlideTitle>
+        <SlideTitle>Movie</SlideTitle>
         <Row
-          key={upcomingIndex}
+          key={index}
           variants={rowVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
           transition={{ type: "tween", duration: 1 }}
         >
-          {upcomingData?.results
+          {data?.results
             .slice(1)
-            .slice(offset * upcomingIndex, offset * upcomingIndex + offset)
+            .slice(offset * index, offset * index + offset)
             .map((movie) => (
               <Box
                 onClick={() => onBoxClicked(movie.id)}
@@ -163,7 +171,7 @@ function UpcomingMovieSlider() {
                 </Info>
               </Box>
             ))}
-          <NextBtn onClick={increadeUpcomingIndex}>〉</NextBtn>
+          <NextBtn onClick={increadeTopIndex}>〉</NextBtn>
         </Row>
       </AnimatePresence>
       <AnimatePresence>
@@ -177,7 +185,7 @@ function UpcomingMovieSlider() {
             />
             <BigMovie
               layoutId={bigMovieMatch.params.movieId}
-              style={{ top: scrollY.get() - 700 }}
+              style={{ top: scrollY.get() + 100 }}
             >
               {clickedMovie && (
                 <>
@@ -201,4 +209,4 @@ function UpcomingMovieSlider() {
   );
 }
 
-export default UpcomingMovieSlider;
+export default MovieSearch;

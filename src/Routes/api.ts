@@ -78,3 +78,15 @@ export async function getUpcomingtVideos() {
     await fetch(`${BASE_PATH}/tv/top_rated?api_key=${API_KEY}`)
   ).json();
 }
+
+export async function getSearchMovies(keyword: string) {
+  return await (
+    await fetch(`${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${keyword}`)
+  ).json();
+}
+
+export async function getSearchTv(keyword: string) {
+  return await (
+    await fetch(`${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`)
+  ).json();
+}
