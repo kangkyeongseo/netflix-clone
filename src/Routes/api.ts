@@ -28,6 +28,15 @@ interface ITv {
   poster_path: string;
   name: string;
   video: false;
+  release_date: string;
+  runtime: number;
+  vote_average: number;
+  genres?: [
+    genre: {
+      id: number;
+      name: string;
+    }
+  ];
 }
 
 export interface IGetMovieResult {
@@ -104,4 +113,8 @@ export async function getMoviesDetail(id: string) {
   return await (
     await fetch(`${BASE_PATH}/movie/${id}?api_key=${API_KEY}`)
   ).json();
+}
+
+export async function getTvDetail(id: string) {
+  return await (await fetch(`${BASE_PATH}/tv/${id}?api_key=${API_KEY}`)).json();
 }
